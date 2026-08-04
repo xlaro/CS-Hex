@@ -1,4 +1,4 @@
-name: Auto Build Plugin Archives
+name: Auto Build Plugin Zip
 
 on:
   push:
@@ -17,17 +17,21 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Create Zip and Zim Files
+      - name: Create Zip Files
         run: |
           mkdir -p CineFreak
           cp -f *.js manifest.json CineFreak/ 2>/dev/null || true
-          zip -r cinefreak.zim CineFreak/
+          
+          # Creates cinefreak.zip with the folder structure
+          zip -r cinefreak.zip CineFreak/
+          
+          # Creates plugins.zip containing the folder structure
           zip -r plugins.zip CineFreak/
 
-      - name: Commit and Push Archives
+      - name: Commit and Push Zip Files
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add cinefreak.zim plugins.zip
-          git commit -m "Auto-build plugin archives [skip ci]" || echo "No changes to commit"
+          git add cinefreak.zip plugins.zip
+          git commit -m "Auto-build zip archives [skip ci]" || echo "No changes to commit"
           git push origin HEAD:${{ github.ref_name }}
