@@ -1,5 +1,3 @@
-mkdir -p .github/workflows
-cat << 'EOF' > .github/workflows/build.yml
 name: Auto Build Plugin Archives
 
 on:
@@ -19,13 +17,10 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Zip Plugin Files
+      - name: Create Zip and Zim Files
         run: |
           mkdir -p CineFreak
-          # Copy all plugin JS and manifest files into the CineFreak build directory
           cp -f *.js manifest.json CineFreak/ 2>/dev/null || true
-          
-          # Create both .zim and .zip packages
           zip -r cinefreak.zim CineFreak/
           zip -r plugins.zip CineFreak/
 
@@ -36,4 +31,3 @@ jobs:
           git add cinefreak.zim plugins.zip
           git commit -m "Auto-build plugin archives [skip ci]" || echo "No changes to commit"
           git push origin HEAD:${{ github.ref_name }}
-EOF
