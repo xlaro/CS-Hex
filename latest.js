@@ -3,13 +3,14 @@
  */
 
 function parseLatestHTML(html) {
-    if (!html) return [];
+    if (!html) return { items: [], currentPage: 1, totalPages: 1, nextPageUrl: null };
 
     try {
         var results = [];
         var cardRegex = /<a\s+href="([^"]+)"\s+class="movie-card"[\s\S]*?<\/a>/gi;
         var match;
 
+        // Parse movie cards
         while ((match = cardRegex.exec(html)) !== null) {
             var cardHtml = match[0];
             var pageUrl = match[1];
@@ -28,9 +29,39 @@ function parseLatestHTML(html) {
             });
         }
 
-        return results;
+        // Parse Pagination Info
+        var currentPage = 1;
+        var totalPages = 1;
+
+        // Extract active page
+        var activeMatch = html.match(/<span class="pagination-item active">(\d+)<\/span>/i);
+        if (activeMatch) {
+            currentPage = parseInt(activeMatch[1], 10);
+        }
+
+        // Extract max page number from pagination links
+        var pageNumRegex = /<a class="pagination-item"[^>]*href="[^"]*\/page\/(\d+)\/?"[^>]*>(\d+)<\/a>/gi;
+        var pageMatch;
+        while ((pageMatch = pageNumRegex.exec(html)) !== null) {
+            var num = parseInt(pageMatch[1], 10);
+            if (num > totalPages) {
+                totalPages = num;
+            }
+        }
+
+        // Determine next page URL
+        var hasNext = currentPage < totalPages;
+        var nextPageUrl = hasNext ? "https://cinefreak.net/page/" + (currentPage + 1) + "/" : null;
+
+        return {
+            items: results,
+            currentPage: currentPage,
+            totalPages: totalPages,
+            hasNextPage: hasNext,
+            nextPageUrl: nextPageUrl
+        };
     } catch (error) {
-        return [];
+        return { items: [], currentPage: 1, totalPages: 1, hasNextPage: false, nextPageUrl: null };
     }
 }
 
@@ -45,6 +76,6 @@ function fetchLatest(page) {
         var html = fetchText(url);
         return parseLatestHTML(html);
     } catch (error) {
-        return [];
+        return { items: [], currentPage: page || 1, totalPages: 1, hasNextPage: false, nextPageUrl: null };
     }
 }
