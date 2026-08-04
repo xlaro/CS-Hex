@@ -1,0 +1,10 @@
+{
+  "name": "CineFreak",
+  "pluginVersion": 1,
+  "description": "CineFreak Provider for Cloudstream",
+  "authors": ["xlaro"],
+  "status": 1,
+  "types": ["TvSeries", "Movie"],
+  "language": "bn",
+  "iconUrl": "https://cinefreak.net/favicon.ico"
+}
